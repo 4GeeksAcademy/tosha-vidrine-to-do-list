@@ -6,25 +6,32 @@ const Home = () => {
   const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
-    // Fetch initial todos from the server
-    fetch('https://playground.4geeks.com/todo/users/tosha_vidrine', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*', // This should ideally be configured on the server
-      }
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          setTodos(data);
-        } else {
-          console.error('Fetched data is not an array:', data);
-        }
-      })
-      .catch(error => console.error('Error fetching todos:', error));
+   getTodos()
   }, []);
-
+const getTodos = async () => {
+  let response = await fetch ("https://playground.4geeks.com/todo/users/tosha_vidrine")
+  if (response.status!=200){
+    let result= await createList()
+    if (result==false){alert("There seems to be a problem with the backend currently. Please try again later.")}
+    else {getTodos()}
+  } 
+  else {
+    let data=await response.json()
+    if (Array.isArray(data.todos)) {
+      setTodos(data.todos);
+    } else {
+      console.error('Fetched data is not an array:', data);
+    }
+  }
+}
+  const createList = async() => {
+    let response=await fetch("https://playground.4geeks.com/todo/users/tosha_vidrine",{
+      method:"POST"
+    })
+    if(response.status!=201){
+      return false 
+    }else{return true}
+  }
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
   };
